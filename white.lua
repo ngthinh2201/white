@@ -6,7 +6,6 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- Set graphics quality to lowest
 local function setLowestGraphicsQuality()
     local success, error = pcall(function()
         settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
@@ -34,22 +33,20 @@ local function setLowestGraphicsQuality()
 end
 setLowestGraphicsQuality()
 
--- Hide other players and non-essential objects
 local hiddenState = false
-local originalPartsState = {} -- Store original properties of parts
+local originalPartsState = {} 
 local hiddenPlayers = {}
 
 local function toggleHidePlayersAndObjects()
     hiddenState = not hiddenState
     if hiddenState then
-        -- Hide other players
+
         for _, player in pairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character then
                 hiddenPlayers[player] = player.Character
                 player.Character.Parent = nil
             end
         end
-        -- Hide non-essential objects, keep only terrain
         for _, obj in pairs(Workspace:GetDescendants()) do
             if not obj:IsA("Terrain") and obj:IsA("BasePart") and obj.Parent ~= LocalPlayer.Character then
                 originalPartsState[obj] = { Transparency = obj.Transparency, Parent = obj.Parent }
@@ -63,14 +60,14 @@ local function toggleHidePlayersAndObjects()
             end
         end
     else
-        -- Restore players
+    
         for player, character in pairs(hiddenPlayers) do
             if character and player.Parent then
                 character.Parent = Workspace
             end
         end
         hiddenPlayers = {}
-        -- Restore objects
+    
         for obj, state in pairs(originalPartsState) do
             if obj then
                 if obj:IsA("BasePart") then
@@ -83,14 +80,11 @@ local function toggleHidePlayersAndObjects()
     end
 end
 
--- Bind toggle to 'H' key
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.H then
         toggleHidePlayersAndObjects()
     end
 end)
-
--- Handle new players joining
 Players.PlayerAdded:Connect(function(player)
     if hiddenState and player ~= LocalPlayer then
         player.CharacterAdded:Connect(function(character)
@@ -220,5 +214,4 @@ if not getgenv().disable_ui then
     end)
 end
 
--- Additional optimization: Reduce physics simulation load
-RunService:SetPhysicsThrottle(0.033) -- Sets physics timestep to ~30 FPS
+RunService:SetPhysicsThrottle(0.033) 
