@@ -1,94 +1,96 @@
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
-local EoBVWnUPxyC = http_request or request or (syn and syn.request)
-if not EoBVWnUPxyC then return end
 
 if not getgenv().disable_ui then
-    local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Parent = game.CoreGui
     ScreenGui.IgnoreGuiInset = true
-    ScreenGui.DisplayOrder = 1000 
+    ScreenGui.DisplayOrder = 1000
 
-    local Background = Instance.new("Frame", ScreenGui)
+    local Background = Instance.new("Frame")
+    Background.Parent = ScreenGui
     Background.Size = UDim2.new(1, 0, 1, 0)
-    Background.Position = UDim2.new(0, 0, 0, 0)
     Background.BackgroundColor3 = Color3.new(0, 0, 0)
-    Background.BackgroundTransparency = 0
     Background.ZIndex = 0
     local isBackgroundVisible = true
 
-    local Frame = Instance.new("Frame", ScreenGui)
+    local Frame = Instance.new("Frame")
+    Frame.Parent = ScreenGui
     Frame.Size = UDim2.new(0, 300, 0, 150)
     Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
     Frame.BackgroundTransparency = 1
     Frame.ZIndex = 1
 
     local Labels = {
-        Name = Instance.new("TextLabel", Frame),
-        FPS = Instance.new("TextLabel", Frame),
-        Ping = Instance.new("TextLabel", Frame)
+        Name = Instance.new("TextLabel"),
+        FPS = Instance.new("TextLabel"),
+        Ping = Instance.new("TextLabel")
     }
     for name, label in pairs(Labels) do
+        label.Parent = Frame
         label.Font = Enum.Font.FredokaOne
         label.TextScaled = true
         label.BackgroundTransparency = 1
         label.TextStrokeTransparency = 0
         label.ZIndex = 2
-        if name == "Name" then
-            label.Size, label.Position = UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 0)
-        elseif name == "FPS" then
-            label.Size, label.Position = UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 50)
-        elseif name == "Ping" then
-            label.Size, label.Position = UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 100)
-        end
+        label.Size = UDim2.new(1, 0, 0, 50)
+        label.Position = UDim2.new(0, 0, 0, (name == "Name" and 0) or (name == "FPS" and 50) or 100)
     end
 
     local State = {
         FrameCount = 0,
         LastUpdate = tick(),
         Hue = 0,
+        LastTouchEnded = 0,
         UpdateInterval = 1,
-        ColorCache = Color3.new(1, 1, 1)
+        DelayTime = 5,
+        IsTouchActive = false
     }
 
-    
-    UserInputService.TouchStarted:Connect(function(input)
+    UserInputService.TouchStarted:Connect(function()
         if isBackgroundVisible then
             Background.Visible = false
             isBackgroundVisible = false
+            State.IsTouchActive = true
         end
     end)
+
     UserInputService.InputEnded:Connect(function(input)
-        if not isBackgroundVisible and input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.Touch then
+            State.IsTouchActive = false
+            State.LastTouchEnded = tick()
+        end
+    end)
+
+    Labels.Name.Text = LocalPlayer.Name
+
+    RunService.RenderStepped:Connect(function(deltaTime)
+        State.FrameCount += 1
+        State.Hue = (State.Hue + deltaTime * 0.5) % 1
+
+        local CurrentTime = tick()
+        if not isBackgroundVisible and not State.IsTouchActive and CurrentTime - State.LastTouchEnded >= State.DelayTime then
             Background.Visible = true
             isBackgroundVisible = true
         end
-    end)
 
-    
-    RunService.Heartbeat:Connect(function(deltaTime)
-        State.FrameCount = State.FrameCount + 1
-        State.Hue = (State.Hue + deltaTime * 0.5) % 1
-        State.ColorCache = Color3.fromHSV(State.Hue, 1, 1)
+        if CurrentTime - State.LastUpdate < State.UpdateInterval then return end
 
-        local CurrentTime = tick()
-        if CurrentTime - State.LastUpdate >= State.UpdateInterval then
-            local Ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue() + 0.5)
-            local FPS = math.floor(State.FrameCount / (CurrentTime - State.LastUpdate))
-            Labels.Name.Text = LocalPlayer.Name
-            Labels.FPS.Text = "FPS: " .. FPS
-            Labels.Ping.Text = "Ping: " .. Ping .. " ms"
-            State.FrameCount, State.LastUpdate = 0, CurrentTime
+        local Ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue() + 0.5)
+        local FPS = math.floor(State.FrameCount / (CurrentTime - State.LastUpdate))
+        Labels.FPS.Text = "FPS: " .. FPS
+        Labels.Ping.Text = "Ping: " .. Ping .. " ms"
 
-    
-            if FPS < 30 then State.UpdateInterval = 2 else State.UpdateInterval = 1 end
-        end
-
+        local color = Color3.fromHSV(State.Hue, 1, 1)
         for _, label in pairs(Labels) do
-            label.TextColor3 = State.ColorCache
+            label.TextColor3 = color
         end
+
+        State.FrameCount = 0
+        State.LastUpdate = CurrentTime
+        State.UpdateInterval = FPS < 30 and 2 or 1
     end)
 end
