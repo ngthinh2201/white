@@ -10,7 +10,7 @@ if not EoBVWnUPxyC then return end
 if not getgenv().disable_ui then
     local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
     ScreenGui.IgnoreGuiInset = true
-    ScreenGui.DisplayOrder = 1000 -- Ưu tiên hiển thị cao nhất
+    ScreenGui.DisplayOrder = 1000 
 
     local Background = Instance.new("Frame", ScreenGui)
     Background.Size = UDim2.new(1, 0, 1, 0)
@@ -54,7 +54,7 @@ if not getgenv().disable_ui then
         ColorCache = Color3.new(1, 1, 1)
     }
 
-    -- Xử lý ẩn/hiện màn đen khi chạm
+    
     UserInputService.TouchStarted:Connect(function(input)
         if isBackgroundVisible then
             Background.Visible = false
@@ -68,7 +68,7 @@ if not getgenv().disable_ui then
         end
     end)
 
-    -- Cập nhật UI với Heartbeat
+    
     RunService.Heartbeat:Connect(function(deltaTime)
         State.FrameCount = State.FrameCount + 1
         State.Hue = (State.Hue + deltaTime * 0.5) % 1
@@ -83,7 +83,7 @@ if not getgenv().disable_ui then
             Labels.Ping.Text = "Ping: " .. Ping .. " ms"
             State.FrameCount, State.LastUpdate = 0, CurrentTime
 
-            -- Điều chỉnh UpdateInterval động dựa trên FPS
+    
             if FPS < 30 then State.UpdateInterval = 2 else State.UpdateInterval = 1 end
         end
 
