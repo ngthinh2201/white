@@ -50,6 +50,7 @@ if not getgenv().disable_ui then
         IsTouchActive = false,
         ShowFullName = false 
     }
+
     local function updateNameDisplay()
         if State.ShowFullName then
             Labels.Name.Text = LocalPlayer.Name
@@ -62,7 +63,10 @@ if not getgenv().disable_ui then
             end
         end
     end
+
+    
     updateNameDisplay()
+    
     UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
         if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.N then
             State.ShowFullName = not State.ShowFullName
