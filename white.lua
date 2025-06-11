@@ -57,14 +57,13 @@ if not getgenv().disable_ui then
         else
             local name = LocalPlayer.Name
             if #name > 3 then
-                Labels.Name.Text = string.sub(name, 1, 3) .. string.rep("*", #name - 3)
+                Labels.Name.Text = string.sub(name, 1, #name - 3) .. string.rep("*", 3)
             else
-                Labels.Name.Text = name .. string.rep("*", 3 - #name)
+                Labels.Name.Text = string.rep("*", 3 - #name) .. name
             end
         end
     end
 
-    
     updateNameDisplay()
     
     UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
