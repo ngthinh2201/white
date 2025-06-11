@@ -47,8 +47,28 @@ if not getgenv().disable_ui then
         LastTouchEnded = 0,
         UpdateInterval = 1,
         DelayTime = 5,
-        IsTouchActive = false
+        IsTouchActive = false,
+        ShowFullName = false 
     }
+    local function updateNameDisplay()
+        if State.ShowFullName then
+            Labels.Name.Text = LocalPlayer.Name
+        else
+            local name = LocalPlayer.Name
+            if #name > 3 then
+                Labels.Name.Text = string.sub(name, 1, 3) .. string.rep("*", #name - 3)
+            else
+                Labels.Name.Text = name .. string.rep("*", 3 - #name)
+            end
+        end
+    end
+    updateNameDisplay()
+    UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+        if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.N then
+            State.ShowFullName = not State.ShowFullName
+            updateNameDisplay()
+        end
+    end)
 
     UserInputService.TouchStarted:Connect(function()
         if isBackgroundVisible then
@@ -64,8 +84,6 @@ if not getgenv().disable_ui then
             State.LastTouchEnded = tick()
         end
     end)
-
-    Labels.Name.Text = LocalPlayer.Name
 
     RunService.RenderStepped:Connect(function(deltaTime)
         State.FrameCount += 1
