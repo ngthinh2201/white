@@ -63,14 +63,14 @@ local function toggleHidePlayersAndObjects()
             end
         end
     else
-        -- Restore players
+
         for player, character in pairs(hiddenPlayers) do
             if character and player.Parent then
                 character.Parent = Workspace
             end
         end
         hiddenPlayers = {}
-        -- Restore objects
+        
         for obj, state in pairs(originalPartsState) do
             if obj then
                 if obj:IsA("BasePart") then
@@ -83,14 +83,12 @@ local function toggleHidePlayersAndObjects()
     end
 end
 
--- Bind toggle to 'H' key
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.H then
         toggleHidePlayersAndObjects()
     end
 end)
 
--- Handle new players joining
 Players.PlayerAdded:Connect(function(player)
     if hiddenState and player ~= LocalPlayer then
         player.CharacterAdded:Connect(function(character)
@@ -219,6 +217,3 @@ if not getgenv().disable_ui then
         State.UpdateInterval = FPS < 30 and 2 or 1
     end)
 end
-
--- Additional optimization: Reduce physics simulation load
-RunService:SetPhysicsThrottle(0.033) -- Sets physics timestep to ~30 FPS
