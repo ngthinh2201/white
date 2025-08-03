@@ -8,4 +8,7 @@ yes | pkg update
 yes | pkg upgrade
 yes | pkg i python
 yes | pkg i python-pip
+yes | pip install pytz
+yes | pip install rich
+
 pip install requests psutil prettytable pycryptodome
