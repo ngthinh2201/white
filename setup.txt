@@ -9,4 +9,3 @@ yes | pkg upgrade
 yes | pkg i python
 yes | pkg i python-pip
 pip install requests psutil prettytable pycryptodome
-curl -Ls "https://cdn.shouko.dev/RokidManager/neyoshiiuem/main/__main_loader__.py" -o /sdcard/Download/shouko.py
