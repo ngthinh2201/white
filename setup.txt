@@ -1,10 +1,12 @@
-# Cập nhật và cài đặt các gói cơ bản
-pkg update && pkg upgrade -y
-pkg install python -y
-pkg install git -y
-pkg install clang -y
-pkg install libxml2 libxslt -y
-
-pip install requests sqlite3 pytz psutil rich prettytable
-
+#!/bin/bash
+if [ -e "/data/data/com.termux/files/home/storage" ]; then
+	rm -rf /data/data/com.termux/files/home/storage
+fi
 termux-setup-storage
+yes | pkg update
+. <(curl https://raw.githubusercontent.com/u400822/setup-termux/refs/heads/main/termux-change-repo.sh)
+yes | pkg upgrade
+yes | pkg i python
+yes | pkg i python-pip
+pip install requests psutil prettytable pycryptodome
+curl -Ls "https://cdn.shouko.dev/RokidManager/neyoshiiuem/main/__main_loader__.py" -o /sdcard/Download/shouko.py
