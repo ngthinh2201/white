@@ -1,0 +1,10 @@
+# Cập nhật và cài đặt các gói cơ bản
+pkg update && pkg upgrade -y
+pkg install python -y
+pkg install git -y
+pkg install clang -y
+pkg install libxml2 libxslt -y
+
+pip install requests sqlite3 pytz psutil rich prettytable
+
+termux-setup-storage
